@@ -1,5 +1,7 @@
 import Phaser from "phaser";
 import { BootScene } from "./scenes/BootScene";
+import { PreloadScene } from "./scenes/PreloadScene";
+import { GameScene } from "./scenes/GameScene";
 
 // SNES native resolution: 256x224
 // We render at this resolution and let Phaser scale up to fill the screen.
@@ -24,7 +26,7 @@ const config: Phaser.Types.Core.GameConfig = {
       debug: false,
     },
   },
-  scene: [BootScene],
+  scene: [BootScene, PreloadScene, GameScene],
 };
 
 new Phaser.Game(config);
