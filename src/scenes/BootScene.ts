@@ -1,11 +1,8 @@
 import Phaser from "phaser";
 
 /**
- * BootScene — the first scene that runs when the game starts.
- *
- * Right now it just renders a title screen to confirm Phaser is working.
- * Later this will transition to a PreloadScene (loading assets) and then
- * the actual game scene.
+ * BootScene — title screen for Exar.
+ * Waits for user input, then starts the PreloadScene.
  */
 export class BootScene extends Phaser.Scene {
   constructor() {
@@ -15,53 +12,58 @@ export class BootScene extends Phaser.Scene {
   create(): void {
     const { width, height } = this.scale;
 
-    // Background gradient rectangle (SNES-style deep blue)
-    this.add.rectangle(width / 2, height / 2, width, height, 0x0a0a2e);
+    // Dark background
+    this.add.rectangle(width / 2, height / 2, width, height, 0x060614);
 
-    // Title text
+    // Stars (scattered dots)
+    const starGfx = this.add.graphics();
+    starGfx.fillStyle(0xffffff, 0.8);
+    for (let i = 0; i < 60; i++) {
+      const sx = Phaser.Math.Between(0, width);
+      const sy = Phaser.Math.Between(0, height - 60);
+      const size = Math.random() < 0.2 ? 2 : 1;
+      starGfx.fillRect(sx, sy, size, size);
+    }
+
+    // Game title
     this.add
-      .text(width / 2, height / 2 - 20, "VIBEGAME", {
+      .text(width / 2, height / 2 - 24, "EXAR", {
         fontFamily: "monospace",
-        fontSize: "20px",
-        color: "#ffffff",
-        stroke: "#000033",
-        strokeThickness: 2,
+        fontSize: "32px",
+        color: "#e8d48b",
+        stroke: "#000000",
+        strokeThickness: 4,
       })
       .setOrigin(0.5);
 
-    // Subtitle / press start prompt
+    // Subtitle
     this.add
-      .text(width / 2, height / 2 + 16, "Phaser 3 + TypeScript", {
+      .text(width / 2, height / 2 + 8, "A TOP-DOWN ADVENTURE", {
         fontFamily: "monospace",
-        fontSize: "8px",
-        color: "#aaaaff",
+        fontSize: "7px",
+        color: "#8898cc",
       })
       .setOrigin(0.5);
 
-    // Blinking "tap to start" prompt
-    const tapText = this.add
-      .text(width / 2, height - 24, "TAP TO START", {
+    // Blinking press-start prompt
+    const prompt = this.add
+      .text(width / 2, height - 28, "PRESS ANY KEY TO START", {
         fontFamily: "monospace",
         fontSize: "8px",
-        color: "#ffff00",
+        color: "#ffff66",
       })
       .setOrigin(0.5);
 
     this.tweens.add({
-      targets: tapText,
+      targets: prompt,
       alpha: 0,
       duration: 500,
       yoyo: true,
       repeat: -1,
     });
 
-    // Framework version info (dev aid)
-    this.add
-      .text(4, height - 8, `Phaser ${Phaser.VERSION}`, {
-        fontFamily: "monospace",
-        fontSize: "6px",
-        color: "#444444",
-      })
-      .setOrigin(0, 1);
+    // Advance on any key or tap
+    this.input.once("pointerdown", () => this.scene.start("PreloadScene"));
+    this.input.keyboard?.once("keydown", () => this.scene.start("PreloadScene"));
   }
 }
